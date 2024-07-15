@@ -1,0 +1,21 @@
+---
+import type { Polymorphic } from 'astro/types';
+
+type Props = Polymorphic<{ as: 'div' }>;
+
+const props = Astro.props
+---
+
+<animated-li {...props}>
+    <slot />
+</animated-li>
+
+<script>
+  class AnimatedList extends HTMLElement {
+    constructor() {
+      super();
+    }
+  }
+
+  customElements.define('animated-li', AnimatedList);
+</script>

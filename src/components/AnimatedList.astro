@@ -1,0 +1,75 @@
+---
+import type { Polymorphic } from 'astro/types';
+
+type Props = { animationType?: 'column' | 'one-by-one' } & Polymorphic<{ as: 'div' }>;
+
+const { animationType, ...props } = Astro.props
+---
+
+
+<animated-list data-animation-type={animationType} {...props}>
+    <slot />
+</animated-list>
+
+<script>
+  import gsap from 'gsap'
+
+  type AnimationStrategy = 'one-by-one' | 'column'
+
+  class AnimatedList extends HTMLElement {
+      animationStrategies: Record<AnimationStrategy, () => void> = {
+          'one-by-one': this.animateOneByOne,
+          'column': this.animateByColumn
+      }
+      defaultAnimationStrategy: AnimationStrategy = 'one-by-one'
+
+    constructor() {
+      super();
+
+      const animationStrategy = this.getAnimationStrategy()
+      this.animateByStrategy(animationStrategy)
+    }
+
+    isAnimationStrategy(value: unknown): value is AnimationStrategy {
+        return typeof value === 'string' && value in this.animationStrategies
+    }
+
+    getAnimationStrategy(): AnimationStrategy {
+        const datasetValue = this.dataset.animationType
+
+        return this.isAnimationStrategy(datasetValue) ? datasetValue : this.defaultAnimationStrategy
+    }
+
+    animateByStrategy(strategy: AnimationStrategy) {
+        this.animationStrategies[strategy].call(this)
+    }
+
+    animateOneByOne() {
+        const tl = gsap.timeline();
+        const listItems = this.querySelectorAll('animated-li');
+        listItems.forEach((listItem) =>
+          tl.from(listItem, { opacity: 0, y: 50, duration: .33 })
+        );
+    }
+
+    animateByColumn() {
+        const tl = gsap.timeline();
+        const listItems = this.querySelectorAll('animated-li');
+
+        const arr = Array.from(listItems)
+        const columns = arr.reduce<Record<number, Element[]>>((acc, curr) => {
+            const key = curr.getBoundingClientRect().top
+
+            return {...acc, [key]: [...(acc[key] ?? []), curr]}
+          }, {})
+        const columnKeys = Object.keys(columns).map(Number).sort()
+
+        columnKeys.forEach((key) => {
+            const column = columns[key]
+            tl.from(column, { opacity: 0, y: 50, duration: .33 })
+        })
+    }
+  }
+
+  customElements.define('animated-list', AnimatedList);
+</script>

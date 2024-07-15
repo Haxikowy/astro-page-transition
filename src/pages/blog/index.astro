@@ -1,4 +1,6 @@
 ---
+import AnimatedList from '../../components/AnimatedList.astro';
+import AnimatedListItem from '../../components/AnimatedListItem.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
 import { getCollection } from 'astro:content';
 import FormattedDate from '../../components/FormattedDate.astro';
@@ -11,10 +13,10 @@ const posts = (await getCollection('blog')).sort(
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
 	<section>
-		<ul>
+		<AnimatedList class="list" animationType="column">
 			{
 				posts.map((post) => (
-					<li>
+					<AnimatedListItem class="list-item">
 						<a href={`/blog/${post.slug}/`}>
 							<img width={720} height={360} src={post.data.heroImage} alt="" />
 							<h4 class="title">{post.data.title}</h4>
@@ -22,10 +24,10 @@ const posts = (await getCollection('blog')).sort(
 								<FormattedDate date={post.data.pubDate} />
 							</p>
 						</a>
-					</li>
+					</AnimatedListItem>
 				))
 			}
-		</ul>
+		</AnimatedList>
 	</section>
 </BaseLayout>
 
@@ -33,7 +35,7 @@ const posts = (await getCollection('blog')).sort(
 	main {
 		width: 960px;
 	}
-	ul {
+	.list {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 2rem;
@@ -41,29 +43,29 @@ const posts = (await getCollection('blog')).sort(
 		margin: 0;
 		padding: 0;
 	}
-	ul li {
+	.list .list-item {
 		width: calc(50% - 1rem);
 	}
-	ul li * {
+	.list .list-item * {
 		text-decoration: none;
 		transition: 0.2s ease;
 	}
-	ul li:first-child {
+	.list .list-item:first-child {
 		width: 100%;
 		margin-bottom: 1rem;
 		text-align: center;
 	}
-	ul li:first-child img {
+	.list .list-item:first-child img {
 		width: 100%;
 	}
-	ul li:first-child .title {
+	.list .list-item:first-child .title {
 		font-size: 2.369rem;
 	}
-	ul li img {
+	.list .list-item img {
 		margin-bottom: 0.5rem;
 		border-radius: 12px;
 	}
-	ul li a {
+	.list .list-item a {
 		display: block;
 	}
 	.title {
@@ -75,25 +77,25 @@ const posts = (await getCollection('blog')).sort(
 		margin: 0;
 		color: rgb(var(--gray));
 	}
-	ul li a:hover h4,
-	ul li a:hover .date {
+	.list .list-item a:hover h4,
+	.list .list-item a:hover .date {
 		color: rgb(var(--accent));
 	}
-	ul a:hover img {
+	.list a:hover img {
 		box-shadow: var(--box-shadow);
 	}
 	@media (max-width: 720px) {
-		ul {
+		.list {
 			gap: 0.5em;
 		}
-		ul li {
+		.list .list-item {
 			width: 100%;
 			text-align: center;
 		}
-		ul li:first-child {
+		.list .list-item:first-child {
 			margin-bottom: 0;
 		}
-		ul li:first-child .title {
+		.list .list-item:first-child .title {
 			font-size: 1.563em;
 		}
 	}
